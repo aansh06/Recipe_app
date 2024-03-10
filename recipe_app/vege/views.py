@@ -1,7 +1,10 @@
 from django.shortcuts import render , redirect
+from django.http import HttpResponse
 from .models import *
 # Create your views here.
 
+
+# ........HOME PAGE
 
 def home(request):
     queryset = Receipe.objects.all()
@@ -9,7 +12,7 @@ def home(request):
     return render(request,'home.html',context)
 
 
-
+# ..........add recipe page
 
 def receipes(request):
     if request.method == "POST":
@@ -33,3 +36,26 @@ def receipes(request):
 
     
     return render(request,'receipes.html')
+
+
+# .......update recipe page
+
+def update_recipe(request,id):
+    
+
+    
+    return render(request,'update_recipe.html')
+
+
+# .......delete a recipe 
+
+def delete_recipe(request,id):
+
+    queryset = Receipe.objects.get(id=id)
+    queryset.delete()
+    return redirect('')
+
+
+
+
+
