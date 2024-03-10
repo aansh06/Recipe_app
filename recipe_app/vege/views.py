@@ -8,8 +8,16 @@ from .models import *
 
 def home(request):
     queryset = Receipe.objects.all()
-    context = {'recipes':queryset}
-    return render(request,'home.html',context)
+    if 'query' in request.GET:
+        queryset=queryset.filter(receipe_name__icontains = request.GET['query'])
+        if not queryset:
+            return redirect('/')
+
+
+    
+   
+    
+    return render(request,'home.html',context= {'recipes':queryset})
 
 
 # ..........add recipe page
@@ -42,9 +50,22 @@ def receipes(request):
 
 def update_recipe(request,id):
     
-
+    queryset = Receipe.objects.get(id=id)
     
-    return render(request,'update_recipe.html')
+    if request.method == "POST":
+        data = request.POST
+        receipe_name= data.get('receipe_name')
+        receipe_description= data.get('receipe_description')
+        receipe_image= request.FILES.get('receipe_image')
+        
+        queryset.receipe_name= receipe_name
+        queryset.receipe_description= receipe_description
+        if receipe_image:
+            queryset.receipe_image= receipe_image
+        
+        queryset.save()
+        return redirect('/')
+    return render(request,'update_recipe.html',context={'recipe':queryset})
 
 
 # .......delete a recipe 
@@ -53,7 +74,7 @@ def delete_recipe(request,id):
 
     queryset = Receipe.objects.get(id=id)
     queryset.delete()
-    return redirect('')
+    return redirect("/")
 
 
 
