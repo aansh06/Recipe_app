@@ -68,15 +68,54 @@
         .search-recipe button:hover {
             background-color: #0056b3;
         }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+        
+        .navbar a {
+            float: right;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#" style="float: left;">Logo</a>
+        {% if request.user.is_authenticated %}
+    <a href="/home/logout">Logout</a>
+{% else %}
+    <a href="/home/login">Login</a>
+{% endif %}
+
+        <!-- Replace the above "Login" link with "Logout" when the user is logged in -->
+    </div>
     <div class="container">
         <h1>My Recipes</h1>
         <div class="search-recipe">
             <form action="/" method="GET">
             {% csrf_token %}
-
+            <div class="messages">
+                {% if messages %}
+                    <ul class="messages-list">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
                 <input type="text" name="query" placeholder="Search recipes...">
                 <button type="submit">Search</button>
             </form>
@@ -95,8 +134,10 @@
             {% endfor %}
         </div>
         <div class="actions">
+            {% if request.user.is_authenticated %}
             <a href="/home/recipe" class="button">Add Recipe</a>
-            <a href="/login" class="button">Login</a>
+            {% endif %}
+            <!-- <a href="/home/login" class="button">Login</a> -->
             <!-- Add more links as needed -->
         </div>
     </div>

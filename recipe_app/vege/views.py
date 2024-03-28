@@ -1,6 +1,9 @@
 from django.shortcuts import render , redirect
 from django.http import HttpResponse
 from .models import *
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate , login , logout
 # Create your views here.
 
 
@@ -14,8 +17,6 @@ def home(request):
             return redirect('/')
 
 
-    
-   
     
     return render(request,'home.html',context= {'recipes':queryset})
 
@@ -77,6 +78,62 @@ def delete_recipe(request,id):
     return redirect("/")
 
 
+# .......login page
+def login_page(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Check if user exists
+        if not User.objects.filter(username=username).exists():
+            messages.error(request, 'Invalid username or password')
+            return redirect('/home/login')
+
+        # Authenticate user
+        user = authenticate(username=username, password=password)
+        if user is None:
+            messages.error(request, 'Invalid username or password')
+            return redirect('/home/login')
+        else:
+            login(request, user)
+            
+            return redirect('/')
+
+    return render(request, 'login.html')
 
 
 
+
+# .......register page
+def register_page(request):
+
+    if request.method == "POST":
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # if username already exists
+        if User.objects.filter(username=username).exists():
+            messages.info(request, 'Username already exists')
+            return redirect('/home/register')
+
+        user = User.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+        )
+        user.set_password(password)  # to save password in encrypted format
+        user.save()
+        messages.info(request, 'Account created successfully')
+
+        return redirect('/home/register')
+
+    return render(request, 'register.html')
+
+
+
+# ....... logout
+def logout_page(request):
+    logout(request)
+    return redirect('/')
